@@ -60,7 +60,6 @@ DEFAULT_SETTINGS = {
 }
 
 def load_settings():
-    # Make a deep copy of defaults
     settings = json.loads(json.dumps(DEFAULT_SETTINGS))
     if os.path.exists(SETTINGS_FILE):
         try:
@@ -284,7 +283,6 @@ def compile_document(md_path):
         markdown_body, auto_calc, currency, tax_rate
     )
     
-    # Load settings to get company context details
     settings = load_settings()
     company_info = settings.get("company", DEFAULT_SETTINGS["company"])
     
@@ -320,7 +318,6 @@ def compile_document(md_path):
         print(f"Using browser: {browser_path} to print to PDF (no header/footer)...")
         try:
             html_url = "file:///" + os.path.abspath(html_path).replace("\\", "/")
-            # Use --no-pdf-header-footer to remove default browser URL/date print headers
             subprocess.run([
                 browser_path, 
                 "--headless", 
@@ -442,7 +439,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         <div class="label-sub">Signature du Client (précédée de la date)</div>
       </div>
       <div class="signature-box">
-        <div class="title"></div>
         <div class="title">Cachet et Signature de l'Agence</div>
       </div>
     </div>
@@ -679,6 +675,7 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             
         desc_cell = row_cells[0]
         desc_p = desc_cell.paragraphs[0]
+        desc_p.paragraph_format.space_before = Pt(0)
         desc_p.paragraph_format.space_after = Pt(2)
         
         full_desc = item["designation"]
@@ -699,6 +696,7 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         
         if details:
             desc_p_sub = desc_cell.add_paragraph()
+            desc_p_sub.paragraph_format.space_before = Pt(0)
             desc_p_sub.paragraph_format.space_after = Pt(0)
             run_desc = desc_p_sub.add_run(details)
             run_desc.font.size = Pt(8.5)
@@ -832,6 +830,7 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             
     doc.add_paragraph().paragraph_format.space_after = Pt(25)
     
+    # Signature Boxes with solid top borders matching the layout
     sig_table = doc.add_table(rows=1, cols=2)
     sig_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     sig_table.autofit = False
@@ -841,21 +840,27 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     c_sig_client = sig_table.cell(0, 0)
     c_sig_agency = sig_table.cell(0, 1)
     
+    # Draw solid top border for both signature boxes
+    set_cell_borders(c_sig_client, top="E2E8F0", bottom=None, left=None, right=None, size="4")
+    set_cell_borders(c_sig_agency, top="E2E8F0", bottom=None, left=None, right=None, size="4")
+    
+    set_cell_margins(c_sig_client, 100, 100, 100, 100)
+    set_cell_margins(c_sig_agency, 100, 100, 100, 100)
+    
     p_sig_c = c_sig_client.paragraphs[0]
     p_sig_c.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_sig_c.paragraph_format.space_after = Pt(40)
-    run_sig_c_hdr = p_sig_c.add_run("Bon pour accord\n\n\n")
-    run_sig_c_hdr.bold = True
+    p_sig_c.paragraph_format.space_before = Pt(30)
+    p_sig_c.paragraph_format.space_after = Pt(2)
+    run_sig_c_hdr = p_sig_c.add_run("Bon pour accord\n")
     run_sig_c_hdr.font.size = Pt(8.5)
     run_sig_c_lbl = p_sig_c.add_run("Signature du Client (précédée de la date)")
     run_sig_c_lbl.font.size = Pt(8.5)
     
     p_sig_a = c_sig_agency.paragraphs[0]
     p_sig_a.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_sig_a.paragraph_format.space_after = Pt(40)
-    run_sig_a_hdr = p_sig_a.add_run("\n\n\n")
+    p_sig_a.paragraph_format.space_before = Pt(30)
+    p_sig_a.paragraph_format.space_after = Pt(2)
     run_sig_a_lbl = p_sig_a.add_run("Cachet et Signature de l'Agence")
-    run_sig_a_lbl.bold = True
     run_sig_a_lbl.font.size = Pt(8.5)
     
     p_foot = doc.add_paragraph()

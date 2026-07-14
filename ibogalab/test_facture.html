@@ -12,7 +12,7 @@
   --secondary-color: #669D69;
   --text-dark: #2d3748;
   --text-light: #718096;
-  --border-color: #e2e8f0;
+  --border-color: #cbd3ce;
   --border-accent: #cbd3ce;
   --bg-light: #fafafa;
 }
@@ -160,16 +160,17 @@ h1, h2, h3, h4 {
   line-height: 1.4;
 }
 
+/* Removed block formatting to allow natural line break with <br> */
 .items-table-wrapper td strong {
   color: var(--primary-color);
   font-size: 9.5pt;
-  display: block;
-  margin-bottom: 4px;
+  font-weight: 700;
 }
 
 .items-table-wrapper td .item-description {
   font-size: 8.5pt;
   color: var(--text-light);
+  margin-top: 2px;
 }
 
 /* Alignments inside table */
@@ -183,7 +184,14 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
-.items-table-wrapper th:nth-child(5), .items-table-wrapper td:nth-child(5) {
+/* Explicitly separate header and cell styling to keep MONTANT HT white */
+.items-table-wrapper th:nth-child(5) {
+  text-align: right;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.items-table-wrapper td:nth-child(5) {
   text-align: right;
   font-weight: 700;
   color: var(--text-dark);
@@ -255,9 +263,6 @@ h1, h2, h3, h4 {
 .summary-row-ttc .amount-wrapper {
   text-align: right;
   line-height: 1.1;
-}
-
-.summary-row-ttc .amount-wrapper {
   font-size: 16pt;
 }
 
@@ -297,43 +302,28 @@ h1, h2, h3, h4 {
   list-style-type: disc;
 }
 
-/* Signatures */
+/* Signatures (Matched with user screenshot) */
 .signatures-section {
   display: flex;
   justify-content: space-between;
-  margin-top: 60px;
+  margin-top: 75px;
   margin-bottom: 50px;
   page-break-inside: avoid;
 }
 
 .signature-box {
-  width: 45%;
+  width: 40%;
+  border-top: 1px solid #e2e8f0; /* Solid gray border line above signature */
+  padding-top: 12px;
   text-align: center;
   font-size: 8.5pt;
   color: var(--text-dark);
-  min-height: 100px;
+  line-height: 1.4;
 }
 
 .signature-box .title {
   font-weight: 500;
   color: var(--text-dark);
-  margin-bottom: 65px;
-}
-
-.signature-box .label-sub {
-  font-size: 8.5pt;
-  color: var(--text-dark);
-}
-
-/* Footer legal info */
-.footer-legal {
-  text-align: center;
-  font-size: 7.5pt;
-  color: var(--text-light);
-  border-top: 1px solid var(--border-color);
-  padding-top: 8px;
-  margin-top: 40px;
-  page-break-inside: avoid;
 }
 
   </style>
@@ -422,7 +412,6 @@ h1, h2, h3, h4 {
         <div class="label-sub">Signature du Client (précédée de la date)</div>
       </div>
       <div class="signature-box">
-        <div class="title"></div>
         <div class="title">Cachet et Signature de l'Agence</div>
       </div>
     </div>
