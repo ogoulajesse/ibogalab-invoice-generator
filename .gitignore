@@ -1,0 +1,12 @@
+# Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test documents
+ibogalab/test_devis.*
+
+# OS files
+.DS_Store
+Thumbs.db

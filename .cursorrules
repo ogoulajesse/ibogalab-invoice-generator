@@ -1,0 +1,22 @@
+# Rules for Iboga Lab Invoice & Quote Generation
+
+You are assisting in drafting, updating, or reviewing quotes ("Devis") and invoices ("Factures") for **Iboga Lab** (https://www.ibogalab.tech/).
+
+## Brand Guidelines
+- **Primary Color**: Deep Forest Green (`#103824`)
+- **Secondary Color**: Soft/Sage Green (`#669D69`)
+- **Fonts**: Montserrat (Headings), Poppins (Body text)
+
+## Rules
+1. **Source File**: Always start by writing or editing the document in Markdown format (`.md`) using YAML front-matter metadata and a markdown table.
+2. **Metadata**: The header must specify `type: DEVIS` or `type: FACTURE`.
+3. **Numbering**: If creating a new document, set `number: auto`. The sync script will automatically replace it with the next sequence number (e.g. `IBGL-2026-D01` or `IBGL-2026-F01`) and update the local JSON counters.
+4. **Calculations**: Set `auto_calculate: true` so the sync script automatically calculates line item totals, Total HT, TVA, and Total TTC.
+5. **Synchronization**: After making any edits to the markdown file, you must run the synchronizer to keep HTML, PDF, and DOCX files in sync:
+   ```bash
+   python skills/ibogalab-invoice-generator/scripts/sync.py path/to/document.md
+   ```
+6. **Watch Mode**: Suggest the user runs in watch mode when working iteratively:
+   ```bash
+   python skills/ibogalab-invoice-generator/scripts/sync.py --watch path/to/document.md
+   ```

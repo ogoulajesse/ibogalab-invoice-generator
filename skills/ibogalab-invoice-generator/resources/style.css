@@ -1,0 +1,292 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  --primary-color: #103824;
+  --primary-light: #184c32;
+  --secondary-color: #669D69;
+  --secondary-light: #f4f8f5;
+  --text-dark: #2d3748;
+  --text-light: #718096;
+  --border-color: #e2e8f0;
+  --border-accent: #cbd3ce;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  font-size: 10.5pt;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* Page Setup for Printing */
+@page {
+  size: A4;
+  margin: 18mm 15mm 20mm 15mm;
+}
+
+.invoice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  background-color: #ffffff;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.company-logo {
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.company-info {
+  font-size: 9pt;
+  color: var(--text-light);
+}
+
+.company-name {
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 2px;
+}
+
+.document-title-block {
+  text-align: right;
+}
+
+.document-type {
+  font-size: 20pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.document-number {
+  font-size: 11pt;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-bottom: 5px;
+}
+
+.document-meta {
+  font-size: 9pt;
+  color: var(--text-light);
+}
+
+/* Metadata Grid (Client & Project) */
+.details-grid {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.details-card {
+  flex: 1;
+  border: 1px solid var(--border-accent);
+  border-radius: 6px;
+  padding: 15px;
+  background-color: var(--secondary-light);
+}
+
+.details-card h3 {
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--secondary-color);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+}
+
+.details-line {
+  font-size: 9.5pt;
+  margin-bottom: 4px;
+}
+
+.details-label {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Items Table */
+table.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 25px;
+}
+
+table.items-table th {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 9.5pt;
+  text-align: left;
+  padding: 10px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+table.items-table th.right, table.items-table td.right {
+  text-align: right;
+}
+
+table.items-table th.center, table.items-table td.center {
+  text-align: center;
+}
+
+table.items-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 9.5pt;
+  vertical-align: top;
+}
+
+table.items-table tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+table.items-table td .item-description {
+  font-size: 8.5pt;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* Post-launch / Subscriptions Section */
+.extra-section {
+  background-color: #fafafa;
+  border-left: 3px solid var(--secondary-color);
+  padding: 12px 15px;
+  margin-bottom: 25px;
+  font-size: 9pt;
+  border-radius: 0 4px 4px 0;
+}
+
+.extra-section h4 {
+  font-size: 9.5pt;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.extra-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+/* Summary Block */
+.summary-block {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+}
+
+.summary-table {
+  width: 320px;
+  border-collapse: collapse;
+}
+
+.summary-table td {
+  padding: 6px 12px;
+  font-size: 9.5pt;
+}
+
+.summary-table tr.total-row {
+  border-top: 2px solid var(--primary-color);
+  font-weight: 700;
+  font-size: 11pt;
+  color: var(--primary-color);
+}
+
+.summary-table tr.total-row td {
+  padding-top: 10px;
+}
+
+/* Conditions & Payment Details */
+.terms-section {
+  font-size: 8.5pt;
+  color: var(--text-light);
+  margin-bottom: 40px;
+  page-break-inside: avoid;
+}
+
+.terms-section h3 {
+  font-size: 9pt;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.terms-section ol {
+  margin: 0;
+  padding-left: 15px;
+}
+
+.terms-section li {
+  margin-bottom: 4px;
+}
+
+/* Signatures */
+.signatures-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+  page-break-inside: avoid;
+}
+
+.signature-box {
+  width: 45%;
+  border-top: 1px dashed var(--border-accent);
+  padding-top: 10px;
+  text-align: center;
+  font-size: 9pt;
+  color: var(--text-light);
+  min-height: 100px;
+}
+
+.signature-box .title {
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 50px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Footer legal info */
+.footer-legal {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 7.5pt;
+  color: var(--text-light);
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+  page-break-inside: avoid;
+}
+
+/* Page Break Helper */
+.page-break {
+  page-break-before: always;
+}
