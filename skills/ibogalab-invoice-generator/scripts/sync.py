@@ -43,19 +43,38 @@ except ImportError:
 
 SETTINGS_FILE = os.path.expanduser("~/.ibogalab-invoice-settings.json")
 
+DEFAULT_SETTINGS = {
+    "counters": {
+        "IBGL-2026-D": 1,
+        "IBGL-2026-F": 1
+    },
+    "company": {
+        "name": "IbogaLab",
+        "address": "Libreville, Gabon",
+        "email": "contact@ibogalab.com",
+        "rccm": "[Votre Numéro]",
+        "nif": "[Votre NIF]",
+        "capital": "1 000 000 FCFA",
+        "website": "www.ibogalab.tech"
+    }
+}
+
 def load_settings():
+    # Make a deep copy of defaults
+    settings = json.loads(json.dumps(DEFAULT_SETTINGS))
     if os.path.exists(SETTINGS_FILE):
         try:
             with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                user_settings = json.load(f)
+                if "counters" in user_settings:
+                    settings["counters"].update(user_settings["counters"])
+                if "company" in user_settings:
+                    settings["company"].update(user_settings["company"])
         except Exception:
             pass
-    return {
-        "counters": {
-            "IBGL-2026-D": 1,
-            "IBGL-2026-F": 1
-        }
-    }
+    else:
+        save_settings(settings)
+    return settings
 
 def save_settings(settings):
     try:
@@ -79,7 +98,6 @@ def get_next_number(doc_type, prefix=None):
     
     doc_number = f"{prefix}{index:02d}"
     
-    # Increment for next time
     counters[prefix] = index + 1
     save_settings(settings)
     
@@ -113,7 +131,6 @@ def set_cell_background(cell, hex_color):
     cell._tc.get_or_add_tcPr().append(shading_elm)
 
 def set_cell_margins(cell, top=140, bottom=140, left=180, right=180):
-    # top, bottom, left, right in dxa (1 pt = 20 dxa)
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for name, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -151,7 +168,6 @@ def parse_markdown(md_path):
     with open(md_path, 'r', encoding='utf-8') as f:
         content = f.read()
         
-    # Parse YAML front-matter
     yaml_data = {}
     markdown_body = content
     
@@ -268,6 +284,10 @@ def compile_document(md_path):
         markdown_body, auto_calc, currency, tax_rate
     )
     
+    # Load settings to get company context details
+    settings = load_settings()
+    company_info = settings.get("company", DEFAULT_SETTINGS["company"])
+    
     dir_name = os.path.dirname(os.path.abspath(md_path))
     base_name = os.path.splitext(os.path.basename(md_path))[0]
     
@@ -290,20 +310,22 @@ def compile_document(md_path):
             
     html_table = markdown.markdown(table_md, extensions=['extra', 'tables'])
     
-    html_content = render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64)
+    html_content = render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info)
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
     print(f"Generated HTML: {html_path}")
     
     browser_path = find_browser()
     if browser_path:
-        print(f"Using browser: {browser_path} to print to PDF...")
+        print(f"Using browser: {browser_path} to print to PDF (no header/footer)...")
         try:
             html_url = "file:///" + os.path.abspath(html_path).replace("\\", "/")
+            # Use --no-pdf-header-footer to remove default browser URL/date print headers
             subprocess.run([
                 browser_path, 
                 "--headless", 
                 "--disable-gpu", 
+                "--no-pdf-header-footer",
                 f"--print-to-pdf={pdf_path}", 
                 html_url
             ], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -313,12 +335,12 @@ def compile_document(md_path):
     else:
         print("Error: Could not find Google Chrome or Microsoft Edge to generate PDF.")
         
-    generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path)
+    generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info)
     print(f"Generated DOCX: {docx_path}")
     
     return html_path, pdf_path, docx_path
 
-def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64):
+def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info):
     doc_type = yaml_data.get("type", "DEVIS").upper()
     doc_number = yaml_data.get("number", "N/A")
     doc_date = yaml_data.get("date", "N/A")
@@ -339,7 +361,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     
     logo_src = f"data:image/png;base64,{logo_base64}" if logo_base64 else ""
     
-    # Meta date block on the right of title bar
     meta_date_text = f"Établi le {doc_date}"
     if doc_type == "DEVIS" and doc_validity:
         meta_date_text += f" - Valide {doc_validity}"
@@ -373,7 +394,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
             """
         recurring_html += "</div>"
         
-    # Totals formatting
     total_ht_f = format_currency(total_ht, currency)
     total_ttc_val = f"{int(round(total_ttc)):,}".replace(",", " ")
     
@@ -404,7 +424,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     </div>
     """
     
-    # Terms
     terms_html = ""
     terms = yaml_data.get("terms", [])
     if terms:
@@ -416,7 +435,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         terms_html += "</ul>"
         terms_html += "</div>"
         
-    # Signatures
     signatures_html = f"""
     <div class="signatures-section">
       <div class="signature-box">
@@ -446,11 +464,11 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         <img class="company-logo" src="{logo_src}" alt="Iboga Lab Logo">
       </div>
       <div class="company-info" style="text-align: right;">
-        <div class="company-name">IbogaLab</div>
-        <div>Libreville, Gabon</div>
-        <div>contact@ibogalab.com</div>
-        <div>RCCM: [Votre Numéro]</div>
-        <div>NIF: [Votre NIF]</div>
+        <div class="company-name">{company_info.get('name', 'IbogaLab')}</div>
+        <div>{company_info.get('address', 'Libreville, Gabon')}</div>
+        <div>{company_info.get('email', 'contact@ibogalab.com')}</div>
+        <div>RCCM: {company_info.get('rccm', '[Votre Numéro]')}</div>
+        <div>NIF: {company_info.get('nif', '[Votre NIF]')}</div>
       </div>
     </div>
     
@@ -480,14 +498,14 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     {signatures_html}
     
     <div class="footer-legal">
-      Iboga Lab SARL - Capital Social de 1 000 000 FCFA - Libreville, Gabon - contact@ibogalab.tech
+      {company_info.get('name', 'Iboga Lab')} SARL - Capital Social de {company_info.get('capital', '1 000 000 FCFA')} - {company_info.get('address', 'Libreville, Gabon')} - {company_info.get('website', 'www.ibogalab.tech')}
     </div>
   </div>
 </body>
 </html>
 """
 
-def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path):
+def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info):
     doc_type = yaml_data.get("type", "DEVIS").upper()
     doc_number = yaml_data.get("number", "N/A")
     doc_date = yaml_data.get("date", "N/A")
@@ -508,13 +526,11 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     
     doc = Document()
     
-    # Colors matching brand
     c_forest = RGBColor(16, 56, 36)      # #103824
     c_sage = RGBColor(102, 157, 105)    # #669D69
     c_dark = RGBColor(45, 55, 72)       # #2D3748
     c_light = RGBColor(113, 128, 150)   # #718096
     
-    # Document A4 Margins
     section = doc.sections[0]
     section.page_width = Inches(8.27)
     section.page_height = Inches(11.69)
@@ -544,18 +560,18 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         
     p_comp = right_cell.paragraphs[0]
     p_comp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run_name = p_comp.add_run("IbogaLab\n")
+    run_name = p_comp.add_run(f"{company_info.get('name', 'IbogaLab')}\n")
     run_name.bold = True
     run_name.font.color.rgb = c_forest
     run_name.font.size = Pt(11.5)
     
-    run_info = p_comp.add_run("Libreville, Gabon\ncontact@ibogalab.com\nRCCM: [Votre Numéro]\nNIF: [Votre NIF]")
+    comp_details_text = f"{company_info.get('address', 'Libreville, Gabon')}\n{company_info.get('email', 'contact@ibogalab.com')}\nRCCM: {company_info.get('rccm', '[Votre Numéro]')}\nNIF: {company_info.get('nif', '[Votre NIF]')}"
+    run_info = p_comp.add_run(comp_details_text)
     run_info.font.color.rgb = c_light
     run_info.font.size = Pt(8)
     
     doc.add_paragraph().paragraph_format.space_after = Pt(10)
     
-    # Shaded green document title bar table
     title_bar_table = doc.add_table(rows=1, cols=2)
     title_bar_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     title_bar_table.autofit = False
@@ -588,7 +604,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     
     doc.add_paragraph().paragraph_format.space_after = Pt(15)
     
-    # Client & Project cards (White background, thin green border)
     info_table = doc.add_table(rows=1, cols=2)
     info_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     info_table.autofit = False
@@ -603,7 +618,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     set_cell_margins(cell_client, 120, 120, 150, 150)
     set_cell_margins(cell_project, 120, 120, 150, 150)
     
-    # Thin green border around cards
     set_cell_borders(cell_client, "669D69", "669D69", "669D69", "669D69", "4")
     set_cell_borders(cell_project, "669D69", "669D69", "669D69", "669D69", "4")
     
@@ -632,7 +646,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     
     doc.add_paragraph().paragraph_format.space_after = Pt(15)
     
-    # Line Items Table
     items_table = doc.add_table(rows=1, cols=5)
     items_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     items_table.autofit = False
@@ -641,7 +654,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     for idx, width in enumerate(col_widths):
         items_table.columns[idx].width = width
         
-    # Table Header shaded in forest green
     hdr_cells = items_table.rows[0].cells
     headers = ["Désignation & Détails", "Unité", "Qté", "P.U. HT", "Montant HT"]
     for idx, name in enumerate(headers):
@@ -657,7 +669,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         elif idx in [3, 4]:
             p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             
-    # Rows (No alternating shading, white background, thin bottom borders)
     for r_idx, item in enumerate(items_data):
         row_cells = items_table.add_row().cells
         
@@ -711,7 +722,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
                 
     doc.add_paragraph().paragraph_format.space_after = Pt(10)
     
-    # Recurring costs as simple clean rows with borders
     recurring_costs = yaml_data.get("recurring_costs", [])
     if recurring_costs:
         rec_table = doc.add_table(rows=0, cols=2)
@@ -722,7 +732,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         
         for item in recurring_costs:
             row_cells = rec_table.add_row().cells
-            # Shading: none
             for cell in row_cells:
                 set_cell_background(cell, "FFFFFF")
                 set_cell_margins(cell, 80, 80, 100, 100)
@@ -741,14 +750,12 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             
         doc.add_paragraph().paragraph_format.space_after = Pt(15)
         
-    # Summary block (HT, divider, TTC)
     summary_table = doc.add_table(rows=0, cols=2)
     summary_table.alignment = WD_TABLE_ALIGNMENT.RIGHT
     summary_table.autofit = False
     summary_table.columns[0].width = Inches(2.2)
     summary_table.columns[1].width = Inches(1.5)
     
-    # Total HT
     doc_type_label = "Développement" if doc_type == "DEVIS" else "Facture"
     row = summary_table.add_row()
     row.cells[0].text = f"Total {doc_type_label} HT"
@@ -756,7 +763,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     set_cell_bottom_border(row.cells[0], "E2E8F0", "4")
     set_cell_bottom_border(row.cells[1], "E2E8F0", "4")
     
-    # TVA if any
     tax_rate = float(yaml_data.get("tax_rate", 0.0))
     if tax_rate > 0:
         row = summary_table.add_row()
@@ -765,7 +771,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         set_cell_bottom_border(row.cells[0], "E2E8F0", "4")
         set_cell_bottom_border(row.cells[1], "E2E8F0", "4")
         
-    # Styling HT and TVA rows
     for r in summary_table.rows:
         for cell in r.cells:
             set_cell_margins(cell, 60, 60, 80, 80)
@@ -774,18 +779,14 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             p.runs[0].font.bold = True
         r.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
         
-    # Add a thin row shaded in forest green (thick divider)
     div_row = summary_table.add_row()
     set_cell_background(div_row.cells[0], "103824")
     set_cell_background(div_row.cells[1], "103824")
     set_cell_margins(div_row.cells[0], 20, 20, 0, 0)
     set_cell_margins(div_row.cells[1], 20, 20, 0, 0)
     
-    # Total TTC Row
     ttc_row = summary_table.add_row()
     ttc_row.cells[0].text = "Total Général TTC"
-    
-    # Currency aligned underneath total
     total_val_s = f"{int(round(total_ttc)):,}".replace(",", " ")
     ttc_row.cells[1].text = f"{total_val_s}\n{currency}"
     
@@ -799,13 +800,11 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
         
     ttc_row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
     if len(ttc_row.cells[1].paragraphs[0].runs) > 0:
-         # Lower size for the currency text
          run_cur = ttc_row.cells[1].paragraphs[0].runs[0]
          run_cur.font.size = Pt(12)
          
     doc.add_paragraph().paragraph_format.space_after = Pt(20)
     
-    # Terms & Conditions (Shaded gray card)
     terms = yaml_data.get("terms", [])
     if terms:
         terms_table = doc.add_table(rows=1, cols=1)
@@ -827,14 +826,12 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             p_term = t_cell.add_paragraph()
             p_term.paragraph_format.left_indent = Inches(0.15)
             p_term.paragraph_format.space_after = Pt(3)
-            # Add bullet points
             run_term = p_term.add_run(f"• {term}")
             run_term.font.size = Pt(8.5)
             run_term.font.color.rgb = c_dark
             
     doc.add_paragraph().paragraph_format.space_after = Pt(25)
     
-    # Signature Boxes (Borderless, clean alignment)
     sig_table = doc.add_table(rows=1, cols=2)
     sig_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     sig_table.autofit = False
@@ -861,11 +858,10 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     run_sig_a_lbl.bold = True
     run_sig_a_lbl.font.size = Pt(8.5)
     
-    # Footer legal info
     p_foot = doc.add_paragraph()
     p_foot.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_foot.paragraph_format.space_before = Pt(30)
-    run_foot = p_foot.add_run("Iboga Lab SARL - Capital Social de 1 000 000 FCFA - Libreville, Gabon - contact@ibogalab.tech")
+    run_foot = p_foot.add_run(f"{company_info.get('name', 'Iboga Lab')} SARL - Capital Social de {company_info.get('capital', '1 000 000 FCFA')} - {company_info.get('address', 'Libreville, Gabon')} - {company_info.get('website', 'www.ibogalab.tech')}")
     run_foot.font.size = Pt(7.5)
     run_foot.font.color.rgb = c_light
     
