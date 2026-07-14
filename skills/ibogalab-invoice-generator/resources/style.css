@@ -3,13 +3,12 @@
 
 :root {
   --primary-color: #103824;
-  --primary-light: #184c32;
   --secondary-color: #669D69;
-  --secondary-light: #f4f8f5;
   --text-dark: #2d3748;
   --text-light: #718096;
   --border-color: #e2e8f0;
   --border-accent: #cbd3ce;
+  --bg-light: #fafafa;
 }
 
 body {
@@ -19,7 +18,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #ffffff;
-  font-size: 10.5pt;
+  font-size: 10pt;
 }
 
 h1, h2, h3, h4 {
@@ -31,7 +30,7 @@ h1, h2, h3, h4 {
 /* Page Setup for Printing */
 @page {
   size: A4;
-  margin: 18mm 15mm 20mm 15mm;
+  margin: 20mm 15mm 20mm 15mm;
 }
 
 .invoice-container {
@@ -46,54 +45,55 @@ h1, h2, h3, h4 {
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 20px;
-  margin-bottom: 25px;
+  align-items: flex-end;
+  padding-bottom: 25px;
+  margin-bottom: 0px;
 }
 
 .company-logo {
   height: 60px;
   object-fit: contain;
-  margin-bottom: 10px;
 }
 
 .company-info {
-  font-size: 9pt;
+  font-size: 8.5pt;
   color: var(--text-light);
+  line-height: 1.4;
 }
 
 .company-name {
-  font-size: 13pt;
+  font-size: 11pt;
   font-weight: 700;
   color: var(--primary-color);
   font-family: 'Montserrat', sans-serif;
   margin-bottom: 2px;
 }
 
-.document-title-block {
-  text-align: right;
-}
-
-.document-type {
-  font-size: 20pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--primary-color);
-  letter-spacing: 1px;
-  margin-bottom: 5px;
-}
-
-.document-number {
-  font-size: 11pt;
+/* Solid Green Document Bar */
+.document-title-bar {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  margin-bottom: 25px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9.5pt;
   font-weight: 600;
-  color: var(--secondary-color);
-  margin-bottom: 5px;
+  border-radius: 2px;
 }
 
-.document-meta {
-  font-size: 9pt;
-  color: var(--text-light);
+.document-title-bar .title-left {
+  font-size: 12pt;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.document-title-bar .meta-right {
+  font-size: 8.5pt;
+  font-weight: 500;
 }
 
 /* Metadata Grid (Client & Project) */
@@ -107,186 +107,221 @@ h1, h2, h3, h4 {
 .details-card {
   flex: 1;
   border: 1px solid var(--border-accent);
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 15px;
-  background-color: var(--secondary-light);
+  background-color: #ffffff;
 }
 
 .details-card h3 {
-  font-size: 10pt;
+  font-size: 8pt;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--secondary-color);
-  padding-bottom: 5px;
+  letter-spacing: 0.8px;
   margin-bottom: 10px;
-  color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .details-line {
-  font-size: 9.5pt;
+  font-size: 9pt;
   margin-bottom: 4px;
-}
-
-.details-label {
-  font-weight: 600;
-  color: var(--primary-color);
+  line-height: 1.4;
 }
 
 /* Items Table */
-table.items-table {
+.items-table-wrapper table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 
-table.items-table th {
+.items-table-wrapper th {
   background-color: var(--primary-color);
   color: #ffffff;
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  font-size: 9.5pt;
+  font-size: 8.5pt;
   text-align: left;
   padding: 10px 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-table.items-table th.right, table.items-table td.right {
-  text-align: right;
+.items-table-wrapper td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 9pt;
+  vertical-align: top;
+  line-height: 1.4;
 }
 
-table.items-table th.center, table.items-table td.center {
+.items-table-wrapper td strong {
+  color: var(--primary-color);
+  font-size: 9.5pt;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.items-table-wrapper td .item-description {
+  font-size: 8.5pt;
+  color: var(--text-light);
+}
+
+/* Alignments inside table */
+.items-table-wrapper th:nth-child(2), .items-table-wrapper td:nth-child(2),
+.items-table-wrapper th:nth-child(3), .items-table-wrapper td:nth-child(3) {
   text-align: center;
 }
 
-table.items-table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 9.5pt;
-  vertical-align: top;
+.items-table-wrapper th:nth-child(4), .items-table-wrapper td:nth-child(4) {
+  text-align: right;
+  white-space: nowrap;
 }
 
-table.items-table tr:nth-child(even) {
-  background-color: #fafbfc;
-}
-
-table.items-table td .item-description {
-  font-size: 8.5pt;
-  color: var(--text-light);
-  margin-top: 4px;
+.items-table-wrapper th:nth-child(5), .items-table-wrapper td:nth-child(5) {
+  text-align: right;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
 }
 
 /* Post-launch / Subscriptions Section */
 .extra-section {
-  background-color: #fafafa;
-  border-left: 3px solid var(--secondary-color);
-  padding: 12px 15px;
+  margin-top: 15px;
   margin-bottom: 25px;
-  font-size: 9pt;
-  border-radius: 0 4px 4px 0;
-}
-
-.extra-section h4 {
-  font-size: 9.5pt;
-  margin-bottom: 5px;
-  color: var(--primary-color);
+  border-top: 1px solid var(--border-color);
 }
 
 .extra-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 3px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 8.5pt;
+  color: var(--text-dark);
+}
+
+.extra-item span {
+  color: var(--text-light);
+}
+
+.extra-item strong {
+  font-weight: 600;
 }
 
 /* Summary Block */
 .summary-block {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 15px;
   margin-bottom: 30px;
 }
 
-.summary-table {
+.summary-row-ht {
+  display: flex;
+  justify-content: space-between;
   width: 320px;
-  border-collapse: collapse;
-}
-
-.summary-table td {
   padding: 6px 12px;
   font-size: 9.5pt;
+  font-weight: 600;
+  color: var(--text-dark);
 }
 
-.summary-table tr.total-row {
-  border-top: 2px solid var(--primary-color);
-  font-weight: 700;
-  font-size: 11pt;
+.totals-divider {
+  width: 320px;
+  height: 4px;
+  background-color: var(--primary-color);
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.summary-row-ttc {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  padding: 8px 12px;
   color: var(--primary-color);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13pt;
+  font-weight: 700;
 }
 
-.summary-table tr.total-row td {
-  padding-top: 10px;
+.summary-row-ttc .amount-wrapper {
+  text-align: right;
+  line-height: 1.1;
+}
+
+.summary-row-ttc .amount-currency {
+  font-size: 9.5pt;
+  display: block;
+  font-weight: 700;
 }
 
 /* Conditions & Payment Details */
 .terms-section {
-  font-size: 8.5pt;
-  color: var(--text-light);
+  background-color: var(--bg-light);
+  border-radius: 4px;
+  padding: 15px 20px;
   margin-bottom: 40px;
+  font-size: 8.5pt;
+  color: var(--text-dark);
+  line-height: 1.5;
   page-break-inside: avoid;
 }
 
 .terms-section h3 {
-  font-size: 9pt;
-  color: var(--primary-color);
-  margin-bottom: 8px;
-  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 10px;
 }
 
-.terms-section ol {
+.terms-section ul {
   margin: 0;
   padding-left: 15px;
 }
 
 .terms-section li {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  list-style-type: disc;
 }
 
 /* Signatures */
 .signatures-section {
   display: flex;
   justify-content: space-between;
-  margin-top: 50px;
+  margin-top: 60px;
+  margin-bottom: 50px;
   page-break-inside: avoid;
 }
 
 .signature-box {
   width: 45%;
-  border-top: 1px dashed var(--border-accent);
-  padding-top: 10px;
   text-align: center;
-  font-size: 9pt;
-  color: var(--text-light);
+  font-size: 8.5pt;
+  color: var(--text-dark);
   min-height: 100px;
 }
 
 .signature-box .title {
-  font-weight: 600;
-  color: var(--primary-color);
-  margin-bottom: 50px;
-  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 65px;
+}
+
+.signature-box .label-sub {
+  font-size: 8.5pt;
+  color: var(--text-dark);
 }
 
 /* Footer legal info */
 .footer-legal {
-  margin-top: 40px;
   text-align: center;
   font-size: 7.5pt;
   color: var(--text-light);
   border-top: 1px solid var(--border-color);
   padding-top: 8px;
+  margin-top: 40px;
   page-break-inside: avoid;
-}
-
-/* Page Break Helper */
-.page-break {
-  page-break-before: always;
 }
