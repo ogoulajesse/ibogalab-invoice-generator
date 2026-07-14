@@ -52,11 +52,24 @@ DEFAULT_SETTINGS = {
         "name": "IbogaLab",
         "address": "Libreville, Gabon",
         "email": "contact@ibogalab.com",
-        "phone": "",  # Empty by default: will not display unless filled
-        "rccm": "",   # Empty by default: will not display unless filled
-        "nif": "",    # Empty by default: will not display unless filled
+        "phone": "",
+        "rccm": "",
+        "nif": "",
         "capital": "1 000 000 FCFA",
         "website": "www.ibogalab.tech"
+    },
+    "default_terms": {
+        "DEVIS": [
+            "Acompte de 40% au lancement du projet.",
+            "Paiements intermédiaires selon planning de livraison.",
+            "Solde de 20% à la mise en production."
+        ],
+        "FACTURE": [
+            "Règlement par virement bancaire sous 10 jours.",
+            "Coordonnées Bancaires (RIB BGFI Bank) :",
+            "IBAN: GA39 3000 1200 1234 5678 9012 345",
+            "BIC / SWIFT: BGFIGAGAXXX"
+        ]
     }
 }
 
@@ -70,6 +83,8 @@ def load_settings():
                     settings["counters"].update(user_settings["counters"])
                 if "company" in user_settings:
                     settings["company"].update(user_settings["company"])
+                if "default_terms" in user_settings:
+                    settings["default_terms"].update(user_settings["default_terms"])
         except Exception:
             pass
     else:
@@ -269,6 +284,8 @@ def compile_document(md_path):
     doc_type = yaml_data.get("type", "DEVIS").upper()
     doc_number = yaml_data.get("number", "auto")
     
+    settings = load_settings()
+    
     if doc_number == "auto":
         prefix = yaml_data.get("prefix", None)
         doc_number = get_next_number(doc_type, prefix)
@@ -284,9 +301,15 @@ def compile_document(md_path):
         markdown_body, auto_calc, currency, tax_rate
     )
     
-    settings = load_settings()
     company_info = settings.get("company", DEFAULT_SETTINGS["company"])
     
+    # Load terms: fallback to settings default_terms if omitted or 'default'
+    terms = yaml_data.get("terms", [])
+    if not terms or (isinstance(terms, str) and terms.lower() == "default") or (isinstance(terms, list) and len(terms) == 0):
+        default_terms_config = settings.get("default_terms", DEFAULT_SETTINGS["default_terms"])
+        terms = default_terms_config.get(doc_type, [])
+        yaml_data["terms"] = terms
+        
     dir_name = os.path.dirname(os.path.abspath(md_path))
     base_name = os.path.splitext(os.path.basename(md_path))[0]
     
@@ -309,7 +332,7 @@ def compile_document(md_path):
             
     html_table = markdown.markdown(table_md, extensions=['extra', 'tables'])
     
-    html_content = render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info)
+    html_content = render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info, terms)
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
     print(f"Generated HTML: {html_path}")
@@ -333,12 +356,12 @@ def compile_document(md_path):
     else:
         print("Error: Could not find Google Chrome or Microsoft Edge to generate PDF.")
         
-    generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info)
+    generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info, terms)
     print(f"Generated DOCX: {docx_path}")
     
     return html_path, pdf_path, docx_path
 
-def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info):
+def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc, css_content, logo_base64, company_info, terms):
     doc_type = yaml_data.get("type", "DEVIS").upper()
     doc_number = yaml_data.get("number", "N/A")
     doc_date = yaml_data.get("date", "N/A")
@@ -403,6 +426,7 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         <span>{total_ht_f}</span>
       </div>
     """
+    tax_rate = float(yaml_data.get("tax_rate", 0.0))
     if vat_amount > 0:
         summary_html += f"""
       <div class="summary-row-ht">
@@ -423,7 +447,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     """
     
     terms_html = ""
-    terms = yaml_data.get("terms", [])
     if terms:
         terms_html += "<div class='terms-section'>"
         terms_html += f"<h3>Conditions de paiement &amp; Modalités :</h3>"
@@ -531,7 +554,7 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
 </html>
 """
 
-def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info):
+def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_path, docx_path, company_info, terms):
     doc_type = yaml_data.get("type", "DEVIS").upper()
     doc_number = yaml_data.get("number", "N/A")
     doc_date = yaml_data.get("date", "N/A")
@@ -590,7 +613,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     run_name.font.color.rgb = c_forest
     run_name.font.size = Pt(11.5)
     
-    # Build clean company info details dynamically for Word
     comp_lines = []
     if company_info.get('address') and company_info['address'].strip():
         comp_lines.append(company_info['address'].strip())
@@ -847,7 +869,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
          
     doc.add_paragraph().paragraph_format.space_after = Pt(20)
     
-    terms = yaml_data.get("terms", [])
     if terms:
         terms_table = doc.add_table(rows=1, cols=1)
         terms_table.alignment = WD_TABLE_ALIGNMENT.CENTER
