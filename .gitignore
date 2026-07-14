@@ -4,8 +4,11 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Test documents
-ibogalab/test_devis.*
+# Client workspace and generated documents
+ibogalab/
+*.pdf
+*.html
+*.docx
 
 # OS files
 .DS_Store
