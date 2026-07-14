@@ -52,8 +52,9 @@ DEFAULT_SETTINGS = {
         "name": "IbogaLab",
         "address": "Libreville, Gabon",
         "email": "contact@ibogalab.com",
-        "rccm": "[Votre Numéro]",
-        "nif": "[Votre NIF]",
+        "phone": "",  # Empty by default: will not display unless filled
+        "rccm": "",   # Empty by default: will not display unless filled
+        "nif": "",    # Empty by default: will not display unless filled
         "capital": "1 000 000 FCFA",
         "website": "www.ibogalab.tech"
     }
@@ -444,6 +445,39 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     </div>
     """
     
+    # Dynamically render company info lines ONLY if they are not empty/whitespace
+    comp_name = company_info.get('name', 'IbogaLab')
+    comp_html_lines = [f"<div class='company-name'>{comp_name}</div>"]
+    
+    if company_info.get('address') and company_info['address'].strip():
+        comp_html_lines.append(f"<div>{company_info['address'].strip()}</div>")
+    if company_info.get('email') and company_info['email'].strip():
+        comp_html_lines.append(f"<div>{company_info['email'].strip()}</div>")
+    if company_info.get('phone') and company_info['phone'].strip():
+        comp_html_lines.append(f"<div>Tél: {company_info['phone'].strip()}</div>")
+    if company_info.get('rccm') and company_info['rccm'].strip() and "[Votre" not in company_info['rccm']:
+        comp_html_lines.append(f"<div>RCCM: {company_info['rccm'].strip()}</div>")
+    if company_info.get('nif') and company_info['nif'].strip() and "[Votre" not in company_info['nif']:
+        comp_html_lines.append(f"<div>NIF: {company_info['nif'].strip()}</div>")
+    if company_info.get('website') and company_info['website'].strip():
+        comp_html_lines.append(f"<div>{company_info['website'].strip()}</div>")
+        
+    company_header_html = "\n".join(comp_html_lines)
+    
+    # Dynamically render footer elements
+    footer_parts = []
+    if company_info.get('name') and company_info['name'].strip():
+        footer_parts.append(f"{company_info['name'].strip()} SARL")
+    if company_info.get('capital') and company_info['capital'].strip():
+        footer_parts.append(f"Capital Social de {company_info['capital'].strip()}")
+    if company_info.get('address') and company_info['address'].strip():
+        footer_parts.append(company_info['address'].strip())
+    if company_info.get('website') and company_info['website'].strip():
+        footer_parts.append(company_info['website'].strip())
+    if company_info.get('phone') and company_info['phone'].strip():
+        footer_parts.append(f"Tél: {company_info['phone'].strip()}")
+    footer_text = " - ".join(footer_parts)
+    
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -460,11 +494,7 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         <img class="company-logo" src="{logo_src}" alt="Iboga Lab Logo">
       </div>
       <div class="company-info" style="text-align: right;">
-        <div class="company-name">{company_info.get('name', 'IbogaLab')}</div>
-        <div>{company_info.get('address', 'Libreville, Gabon')}</div>
-        <div>{company_info.get('email', 'contact@ibogalab.com')}</div>
-        <div>RCCM: {company_info.get('rccm', '[Votre Numéro]')}</div>
-        <div>NIF: {company_info.get('nif', '[Votre NIF]')}</div>
+        {company_header_html}
       </div>
     </div>
     
@@ -494,7 +524,7 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     {signatures_html}
     
     <div class="footer-legal">
-      {company_info.get('name', 'Iboga Lab')} SARL - Capital Social de {company_info.get('capital', '1 000 000 FCFA')} - {company_info.get('address', 'Libreville, Gabon')} - {company_info.get('website', 'www.ibogalab.tech')}
+      {footer_text}
     </div>
   </div>
 </body>
@@ -540,7 +570,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     normal_style.font.size = Pt(9.5)
     normal_style.font.color.rgb = c_dark
     
-    # Header: Logo & Company details
     header_table = doc.add_table(rows=1, cols=2)
     header_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     header_table.autofit = False
@@ -561,7 +590,22 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     run_name.font.color.rgb = c_forest
     run_name.font.size = Pt(11.5)
     
-    comp_details_text = f"{company_info.get('address', 'Libreville, Gabon')}\n{company_info.get('email', 'contact@ibogalab.com')}\nRCCM: {company_info.get('rccm', '[Votre Numéro]')}\nNIF: {company_info.get('nif', '[Votre NIF]')}"
+    # Build clean company info details dynamically for Word
+    comp_lines = []
+    if company_info.get('address') and company_info['address'].strip():
+        comp_lines.append(company_info['address'].strip())
+    if company_info.get('email') and company_info['email'].strip():
+        comp_lines.append(company_info['email'].strip())
+    if company_info.get('phone') and company_info['phone'].strip():
+        comp_lines.append(f"Tél: {company_info['phone'].strip()}")
+    if company_info.get('rccm') and company_info['rccm'].strip() and "[Votre" not in company_info['rccm']:
+        comp_lines.append(f"RCCM: {company_info['rccm'].strip()}")
+    if company_info.get('nif') and company_info['nif'].strip() and "[Votre" not in company_info['nif']:
+        comp_lines.append(f"NIF: {company_info['nif'].strip()}")
+    if company_info.get('website') and company_info['website'].strip():
+        comp_lines.append(company_info['website'].strip())
+        
+    comp_details_text = "\n".join(comp_lines)
     run_info = p_comp.add_run(comp_details_text)
     run_info.font.color.rgb = c_light
     run_info.font.size = Pt(8)
@@ -830,7 +874,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
             
     doc.add_paragraph().paragraph_format.space_after = Pt(25)
     
-    # Signature Boxes with solid top borders matching the layout
     sig_table = doc.add_table(rows=1, cols=2)
     sig_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     sig_table.autofit = False
@@ -840,7 +883,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     c_sig_client = sig_table.cell(0, 0)
     c_sig_agency = sig_table.cell(0, 1)
     
-    # Draw solid top border for both signature boxes
     set_cell_borders(c_sig_client, top="E2E8F0", bottom=None, left=None, right=None, size="4")
     set_cell_borders(c_sig_agency, top="E2E8F0", bottom=None, left=None, right=None, size="4")
     
@@ -863,10 +905,24 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     run_sig_a_lbl = p_sig_a.add_run("Cachet et Signature de l'Agence")
     run_sig_a_lbl.font.size = Pt(8.5)
     
+    # Build clean footer text dynamically for Word
+    footer_parts = []
+    if company_info.get('name') and company_info['name'].strip():
+        footer_parts.append(f"{company_info['name'].strip()} SARL")
+    if company_info.get('capital') and company_info['capital'].strip():
+        footer_parts.append(f"Capital Social de {company_info['capital'].strip()}")
+    if company_info.get('address') and company_info['address'].strip():
+        footer_parts.append(company_info['address'].strip())
+    if company_info.get('website') and company_info['website'].strip():
+        footer_parts.append(company_info['website'].strip())
+    if company_info.get('phone') and company_info['phone'].strip():
+        footer_parts.append(f"Tél: {company_info['phone'].strip()}")
+    footer_text = " - ".join(footer_parts)
+    
     p_foot = doc.add_paragraph()
     p_foot.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_foot.paragraph_format.space_before = Pt(30)
-    run_foot = p_foot.add_run(f"{company_info.get('name', 'Iboga Lab')} SARL - Capital Social de {company_info.get('capital', '1 000 000 FCFA')} - {company_info.get('address', 'Libreville, Gabon')} - {company_info.get('website', 'www.ibogalab.tech')}")
+    run_foot = p_foot.add_run(footer_text)
     run_foot.font.size = Pt(7.5)
     run_foot.font.color.rgb = c_light
     
