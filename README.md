@@ -154,15 +154,49 @@ Exécutez le script pour générer les fichiers HTML, PDF et DOCX :
 
 ---
 
-## 🗃️ Gestion de la numérotation (Settings JSON)
-Les compteurs de séquence sont stockés dans `~/.ibogalab-invoice-settings.json` :
+## ⚙️ Configuration de l'Entreprise & Numérotation
+
+Toutes les informations administratives de l'entreprise ainsi que l'état des compteurs de numéros sont centralisés dans un fichier de configuration local unique :
+📂 **`~/.ibogalab-invoice-settings.json`**
+
+Ce fichier est créé automatiquement lors de la première installation ou de la première exécution du script de synchronisation.
+
+### 1. Structure du Fichier de Paramètres (`.ibogalab-invoice-settings.json`)
+
+Voici un exemple du contenu de ce fichier (que vous pouvez ouvrir et modifier avec n'importe quel éditeur de texte) :
+
 ```json
 {
   "counters": {
     "IBGL-2026-D": 2,
-    "IBGL-2026-F": 1
+    "IBGL-2026-F": 2
+  },
+  "company": {
+    "name": "IbogaLab",
+    "address": "Libreville, Gabon",
+    "email": "contact@ibogalab.tech",
+    "phone": "+241 07 00 00 00",
+    "rccm": "RG-LBV-2026-A-12345",
+    "nif": "765432B",
+    "capital": "1 000 000 FCFA",
+    "website": "www.ibogalab.tech"
   }
 }
 ```
-Vous pouvez ajuster directement ce fichier pour modifier la valeur du prochain numéro de facture ou de devis généré.
-- Si vous définissez un préfixe personnalisé dans votre front-matter (ex: `prefix: "IBGL-2026-GS"`), le script l'enregistrera automatiquement comme un nouveau compteur et gérera sa propre séquence de numérotation.
+
+### 2. Personnalisation de l'Entreprise
+*   **Masquage automatique** : Si certaines informations ne s'appliquent pas à votre entreprise ou ne sont pas encore disponibles (comme le **NIF**, le **RCCM** ou le **Téléphone**), il vous suffit de laisser leur valeur vide `""` dans le fichier JSON. Le script de génération n'affichera pas ces lignes (aucun texte ou conteneur vide n'apparaîtra dans le document généré).
+*   **Emplacement physique du fichier selon le système** :
+    *   **Windows** : `C:\Users\<VotreNom>\.ibogalab-invoice-settings.json`
+    *   **macOS / Linux** : `/Users/<VotreNom>/.ibogalab-invoice-settings.json` (ou `/home/...`)
+
+### 3. Gestion de la Numérotation (Séquences)
+*   **Incrémentation** : La clé `"counters"` garde en mémoire le numéro de séquence suivant de chaque préfixe. Vous pouvez modifier directement ces chiffres si vous souhaitez sauter des numéros ou reprendre une facturation existante.
+*   **Multi-préfixe** : Si vous définissez un préfixe de numérotation personnalisé dans le front-matter Markdown (ex: `prefix: "IBGL-2026-GS"`), le script le détectera automatiquement et enregistrera sa propre séquence dans le fichier de paramètres.
+
+### 4. Personnalisation du Logo
+Pour modifier le logo officiel d'Iboga Lab qui s'affiche en haut à gauche :
+Remplacez le fichier image `logo1.png` situé dans :
+`skills/ibogalab-invoice-generator/resources/logo1.png`
+Le script le ré-encodera automatiquement en Base64 lors de la prochaine génération.
+
