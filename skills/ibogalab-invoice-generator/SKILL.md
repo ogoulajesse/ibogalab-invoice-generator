@@ -75,3 +75,10 @@ python skills/ibogalab-invoice-generator/scripts/sync.py --watch path/to/documen
 ## 3. Gestion de l'état des numéros
 Les numéros de devis et factures sont conservés localement dans `~/.ibogalab-invoice-settings.json`.
 Le script se charge d'incrémenter l'index approprié de façon persistante et d'écrire la valeur directement dans le front-matter du fichier Markdown source lors de sa première compilation pour éviter les doublons.
+
+## 4. Organisation des Dossiers (Livrables Locaux)
+Pour préserver la propreté du dépôt Git et éviter toute fuite de données confidentielles :
+1. **Dossier de stockage** : Tous les fichiers Markdown source, ainsi que leurs versions HTML, PDF et DOCX générées, doivent être impérativement regroupés dans un dossier nommé **`devis-factures/`** à la racine de votre espace de travail.
+2. **Création automatique** : Lors de la première génération de devis ou de facture, l'agent ou l'utilisateur doit créer ce dossier `devis-factures/` s'il n'existe pas déjà.
+3. **Sécurité Git** : Ce dossier est configuré pour être exclu du dépôt distant (via le fichier `.gitignore`), assurant que les données commerciales restent en local sur la machine de l'utilisateur.
+

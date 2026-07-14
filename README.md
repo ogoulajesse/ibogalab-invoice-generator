@@ -106,13 +106,14 @@ Il vous suffit de **relancer la même ligne de commande**. Le script d'installat
 ## 📝 Guide d'Utilisation
 
 ### Étape 1 : Créer le fichier Markdown
-Copiez le modèle depuis `skills/ibogalab-invoice-generator/examples/devis_template.md` (ou `facture_template.md`) vers votre dossier de projet.
+1. Créez un dossier nommé **`devis-factures/`** à la racine de votre espace de travail s'il n'existe pas.
+2. Copiez le modèle depuis `skills/ibogalab-invoice-generator/examples/devis_template.md` (ou `facture_template.md`) dans ce dossier.
 
-Exemple de contenu (`mon_devis.md`) :
+Exemple de contenu (`devis-factures/mon_devis.md`) :
 ```yaml
 ---
 type: DEVIS
-number: auto           # Le script incrémentera le compteur et remplacera 'auto'
+number: auto           # Le script remplacera 'auto' par le numéro suivant (ex: IBGL-2026-D01)
 date: "2026-07-14"
 validity: "30 jours"
 client:
@@ -142,15 +143,15 @@ Exécutez le script pour générer les fichiers HTML, PDF et DOCX :
 
 * **Rendu unique** :
   ```bash
-  python skills/ibogalab-invoice-generator/scripts/sync.py mon_devis.md
+  python skills/ibogalab-invoice-generator/scripts/sync.py devis-factures/mon_devis.md
   ```
-  *Le fichier `mon_devis.md` sera modifié pour remplacer `number: auto` par le numéro généré (ex: `IBGL-2026-D01`), et les fichiers `mon_devis.html`, `mon_devis.pdf` et `mon_devis.docx` seront créés dans le même dossier.*
+  *Le fichier `devis-factures/mon_devis.md` sera modifié pour remplacer `number: auto` par le numéro généré (ex: `IBGL-2026-D01`), et les fichiers `devis-factures/mon_devis.html`, `devis-factures/mon_devis.pdf` et `devis-factures/mon_devis.docx` seront créés dans le même dossier.*
 
 * **Rendu en tâche de fond (Watch mode)** :
   ```bash
-  python skills/ibogalab-invoice-generator/scripts/sync.py --watch mon_devis.md
+  python skills/ibogalab-invoice-generator/scripts/sync.py --watch devis-factures/mon_devis.md
   ```
-  *Le script surveille `mon_devis.md`. À chaque sauvegarde, il recalcule les totaux et met à jour l'HTML, le PDF et le Word en moins d'une seconde.*
+  *Le script surveille `devis-factures/mon_devis.md`. À chaque sauvegarde, il recalcule les totaux et met à jour l'HTML, le PDF et le Word en moins d'une seconde.*
 
 ---
 
