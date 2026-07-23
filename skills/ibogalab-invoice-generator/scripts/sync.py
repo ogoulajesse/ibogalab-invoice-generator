@@ -545,10 +545,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
     {summary_html}
     {terms_html}
     {signatures_html}
-    
-    <div class="footer-legal">
-      {footer_text}
-    </div>
   </div>
 </body>
 </html>
@@ -925,27 +921,6 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     p_sig_a.paragraph_format.space_after = Pt(2)
     run_sig_a_lbl = p_sig_a.add_run("Cachet et Signature de l'Agence")
     run_sig_a_lbl.font.size = Pt(8.5)
-    
-    # Build clean footer text dynamically for Word
-    footer_parts = []
-    if company_info.get('name') and company_info['name'].strip():
-        footer_parts.append(f"{company_info['name'].strip()} SARL")
-    if company_info.get('capital') and company_info['capital'].strip():
-        footer_parts.append(f"Capital Social de {company_info['capital'].strip()}")
-    if company_info.get('address') and company_info['address'].strip():
-        footer_parts.append(company_info['address'].strip())
-    if company_info.get('website') and company_info['website'].strip():
-        footer_parts.append(company_info['website'].strip())
-    if company_info.get('phone') and company_info['phone'].strip():
-        footer_parts.append(f"Tél: {company_info['phone'].strip()}")
-    footer_text = " - ".join(footer_parts)
-    
-    p_foot = doc.add_paragraph()
-    p_foot.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_foot.paragraph_format.space_before = Pt(30)
-    run_foot = p_foot.add_run(footer_text)
-    run_foot.font.size = Pt(7.5)
-    run_foot.font.color.rgb = c_light
     
     doc.save(docx_path)
 
