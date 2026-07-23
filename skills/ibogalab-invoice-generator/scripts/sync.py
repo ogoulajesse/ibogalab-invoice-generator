@@ -463,7 +463,7 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         <div class="label-sub">Signature du Client (précédée de la date)</div>
       </div>
       <div class="signature-box">
-        <div class="title">Cachet et Signature de l'Agence</div>
+        <div class="title">Signature du représentant de l'agence</div>
       </div>
     </div>
     """
@@ -919,7 +919,7 @@ def generate_docx(yaml_data, items_data, total_ht, vat_amount, total_ttc, logo_p
     p_sig_a.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sig_a.paragraph_format.space_before = Pt(30)
     p_sig_a.paragraph_format.space_after = Pt(2)
-    run_sig_a_lbl = p_sig_a.add_run("Cachet et Signature de l'Agence")
+    run_sig_a_lbl = p_sig_a.add_run("Signature du représentant de l'agence")
     run_sig_a_lbl.font.size = Pt(8.5)
     
     doc.save(docx_path)
