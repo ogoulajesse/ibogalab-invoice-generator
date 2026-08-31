@@ -487,20 +487,6 @@ def render_html_template(yaml_data, html_table, total_ht, vat_amount, total_ttc,
         
     company_header_html = "\n".join(comp_html_lines)
     
-    # Dynamically render footer elements
-    footer_parts = []
-    if company_info.get('name') and company_info['name'].strip():
-        footer_parts.append(f"{company_info['name'].strip()} SARL")
-    if company_info.get('capital') and company_info['capital'].strip():
-        footer_parts.append(f"Capital Social de {company_info['capital'].strip()}")
-    if company_info.get('address') and company_info['address'].strip():
-        footer_parts.append(company_info['address'].strip())
-    if company_info.get('website') and company_info['website'].strip():
-        footer_parts.append(company_info['website'].strip())
-    if company_info.get('phone') and company_info['phone'].strip():
-        footer_parts.append(f"Tél: {company_info['phone'].strip()}")
-    footer_text = " - ".join(footer_parts)
-    
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>

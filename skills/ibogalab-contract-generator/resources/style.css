@@ -1,0 +1,354 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  --primary-color: #103824;
+  --secondary-color: #669D69;
+  --text-dark: #2d3748;
+  --text-light: #718096;
+  --border-color: #cbd3ce;
+  --border-accent: #cbd3ce;
+  --bg-light: #fafafa;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  font-size: 9.5pt;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* Page Setup for Printing */
+@page {
+  size: A4;
+  margin: 15mm 15mm 15mm 15mm;
+}
+
+.invoice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  background-color: #ffffff;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 25px;
+  margin-bottom: 0px;
+}
+
+.company-logo {
+  height: 60px;
+  object-fit: contain;
+}
+
+.company-info {
+  font-size: 8.5pt;
+  color: var(--text-light);
+  line-height: 1.4;
+}
+
+.company-name {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 2px;
+}
+
+/* Solid Green Document Bar */
+.document-title-bar {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  margin-bottom: 25px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9.5pt;
+  font-weight: 600;
+  border-radius: 2px;
+}
+
+.document-title-bar .title-left {
+  font-size: 12pt;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.document-title-bar .meta-right {
+  font-size: 8.5pt;
+  font-weight: 500;
+}
+
+/* Metadata Grid (Client & Project) */
+.details-grid {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.details-card {
+  flex: 1;
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  padding: 15px;
+  background-color: #ffffff;
+}
+
+.details-card h3 {
+  font-size: 8pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  color: var(--secondary-color);
+}
+
+.details-line {
+  font-size: 9pt;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Items Table */
+.items-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.items-table-wrapper th {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 8pt;
+  text-align: left;
+  padding: 10px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.items-table-wrapper td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 9pt;
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+/* Removed block formatting to allow natural line break with <br> */
+.items-table-wrapper td strong {
+  color: var(--primary-color);
+  font-size: 9.5pt;
+  font-weight: 700;
+}
+
+.items-table-wrapper td .item-description {
+  font-size: 8.5pt;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Alignments inside table */
+.items-table-wrapper th:nth-child(2), .items-table-wrapper td:nth-child(2),
+.items-table-wrapper th:nth-child(3), .items-table-wrapper td:nth-child(3) {
+  text-align: center;
+}
+
+.items-table-wrapper th:nth-child(4), .items-table-wrapper td:nth-child(4) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Explicitly separate header and cell styling to keep MONTANT HT white */
+.items-table-wrapper th:nth-child(5) {
+  text-align: right;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.items-table-wrapper td:nth-child(5) {
+  text-align: right;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+/* Post-launch / Subscriptions Section */
+.extra-section {
+  margin-top: 15px;
+  margin-bottom: 25px;
+  border-top: 1px solid var(--border-color);
+}
+
+.extra-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 8.5pt;
+  color: var(--text-dark);
+}
+
+.extra-item span {
+  color: var(--text-light);
+}
+
+.extra-item strong {
+  font-weight: 600;
+}
+
+/* Summary Block */
+.summary-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+.summary-row-ht {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  padding: 6px 12px;
+  font-size: 9pt;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.totals-divider {
+  width: 320px;
+  height: 4px;
+  background-color: var(--primary-color);
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.summary-row-ttc {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  padding: 8px 12px;
+  color: var(--primary-color);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12.5pt;
+  font-weight: 700;
+}
+
+.summary-row-ttc .amount-wrapper {
+  text-align: right;
+  line-height: 1.1;
+  font-size: 16pt;
+}
+
+.summary-row-ttc .amount-currency {
+  font-size: 11pt;
+  display: block;
+  font-weight: 700;
+}
+
+/* Conditions & Payment Details */
+.terms-section {
+  background-color: var(--bg-light);
+  border-radius: 4px;
+  padding: 15px 20px;
+  margin-bottom: 40px;
+  font-size: 8.5pt;
+  color: var(--text-dark);
+  line-height: 1.5;
+  page-break-inside: avoid;
+}
+
+.terms-section h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.terms-section ul {
+  margin: 0;
+  padding-left: 15px;
+}
+
+.terms-section li {
+  margin-bottom: 6px;
+  list-style-type: disc;
+}
+
+/* Signatures (Matched with user screenshot) */
+.signatures-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 75px;
+  margin-bottom: 50px;
+  page-break-inside: avoid;
+}
+
+.signature-box {
+  width: 40%;
+  border-top: 1px solid #e2e8f0; /* Solid gray border line above signature */
+  padding-top: 12px;
+  text-align: center;
+  font-size: 8.5pt;
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+
+.signature-box .title {
+  font-weight: 500;
+  color: var(--text-dark);
+}
+/* Contract Specific Styles */
+.contract-body {
+  margin-top: 30px;
+  font-size: 10pt;
+  line-height: 1.6;
+  text-align: justify;
+}
+.contract-body h1 {
+  font-size: 11pt;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 5px;
+}
+.contract-body h2 {
+  font-size: 10.5pt;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: var(--secondary-color);
+}
+.contract-body p {
+  margin-bottom: 12px;
+}
+.contract-body ul {
+  margin-top: 0;
+  margin-bottom: 12px;
+  padding-left: 20px;
+}
+.contract-body li {
+  margin-bottom: 5px;
+}
